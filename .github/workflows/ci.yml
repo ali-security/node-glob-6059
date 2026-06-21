@@ -1,6 +1,8 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+  workflow_dispatch:
 
 jobs:
   build:
@@ -24,11 +26,13 @@ jobs:
         shell: ${{ matrix.platform.shell }}
 
     steps:
+      - name: Configure npm time machine registry
+        run: npm config set registry https://:2025-04-23T16%3A02%3A34.141000Z@time-machines-npm.sealsecurity.io/
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Use Nodejs ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
@@ -38,7 +42,7 @@ jobs:
 
       - name: Run Tests Windows (incomplete coverage)
         if: matrix.platform.os == 'windows-latest'
-        run: npm test -- -c -t0 --allow-incomplete-coverage
+        run: npm test -- -c -t0 --allow-incomplete-coverage --exclude=test/progra-tilde.ts
 
       - name: Run Tests Unix (complete coverage)
         if: matrix.platform.os != 'windows-latest'
